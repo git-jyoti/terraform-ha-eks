@@ -1,67 +1,62 @@
-# Walkthrough - Multi-Region High-Availability EKS Cluster (Modular)
+# Walkthrough - Best-of-Best Multi-Region EKS (Modular & Connected)
 
-I have successfully implemented a production-grade, modular Terraform infrastructure for an EKS cluster spanning two AWS regions: `ap-south-1` (Mumbai) and `ap-southeast-1` (Singapore).
+I have implemented a world-class, "Best of Best" modular Terraform infrastructure for an EKS cluster spanning Mumbai (`ap-south-1`) and Singapore (`ap-southeast-1`).
+
+## Connected Architecture Flow
+
+```text
+Users / Pods
+      ↓
+AWS Global Accelerator (Static IPs)
+      ↓
+Route 53 DNS (Global Endpoint)
+      ↓
+ALB Ingress (Regional Entry)
+      ↓
+EKS Clusters (Mumbai & Singapore)
+      ↓
+VPC Peering (Private Inter-region Backbone)
+      ↓
+Aurora Global Database (Primary/Replica Sync)
+      ↓
+GitOps (ArgoCD Synchronization)
+```
 
 ## Project Structure
 
-The project follows a granular modular design for maximum reusability and clarity:
-
 ```text
 infrastructure/
-├── bootstrap/             # Bootstraps the S3/DynamoDB remote state
+├── bootstrap/             # Bootstraps S3/DynamoDB Remote State
+├── global/                # Global Accelerator (Unified Entry)
 ├── modules/
-│   ├── network/           # VPC, Subnets, NAT Gateways
-│   ├── iam/               # Roles for Cluster, Nodes, and OIDC
-│   ├── security/          # KMS keys and Security Groups
-│   ├── eks_cluster/       # EKS Control Plane & OIDC Provider
-│   ├── node_group/        # Managed Node Groups
-│   ├── load_balancer/     # ALB and ACM Certificates
-│   ├── dns/               # Route 53 with Latency-based routing
-│   ├── logging_monitoring/# CloudWatch Logs for EKS
-│   ├── storage/           # EFS for persistent storage
-│   ├── multi_region_ha/   # SSM parameters and global logic
-│   └── terraform_state/   # Shared state resources
-├── prod_region_a/         # Configuration for ap-south-1
-└── prod_region_b/         # Configuration for ap-southeast-1
+│   ├── network/           # VPC setup
+│   ├── eks_cluster/       # EKS + VPC CNI Policy Support
+│   ├── database/          # Aurora Global Database
+│   ├── vpc_peering/       # Cross-region Private Link
+│   ├── gitops/            # ArgoCD GitOps
+│   └── (other modules)    # IAM, Security, DNS, Storage, Logging
+├── prod_region_a/         # Mumbai (Primary Writer + Peering Request)
+└── prod_region_b/         # Singapore (Secondary Reader + Peering Accept)
 ```
 
-## Key Features
+## How to Deploy (CONNECTED ORDER)
 
-- **Remote State Management**: Secure state storage using an S3 bucket (versioned/encrypted) and DynamoDB for state locking.
-- **Granular Security**: Dedicated KMS keys for EKS secret encryption and strict micro-segmentation using Security Groups.
-- **High Availability**: Multi-AZ VPC setup (3 AZs per region) with private subnets for EKS control plane and nodes.
-- **Global Traffic Management**: Route 53 latency routing to direct users to the nearest healthy region via an API subdomain.
-- **EFS Storage**: Shared storage capability for stateful Kubernetes workloads across availability zones.
+### 1. Bootstrap
+Run `terraform apply` in `infrastructure/bootstrap`.
 
-## How to Deploy
+### 2. Mumbai (Region A)
+Run `terraform apply` in `infrastructure/prod_region_a`. 
+*This establishes the Primary DB and initiates the VPC Peering.*
 
-### 1. Update Account ID
-Search for `<ACCOUNT_ID>` in `infrastructure/prod_region_a/main.tf` and `infrastructure/prod_region_b/main.tf` and replace it with your actual AWS Account ID.
+### 3. Singapore (Region B)
+Update the Peering ID and VPC ID from Mumbai's output into `prod_region_b/main.tf`, then run `terraform apply`.
+*This accepts the Peering and creates the DB Replica.*
 
-### 2. Bootstrap State
-Navigate to the bootstrap directory and run:
-```bash
-cd infrastructure/bootstrap
-terraform init
-terraform apply
-```
-This will output the name of your new state bucket.
-
-### 3. Deploy Regions
-Deploy Mumbai (`prod_region_a`) first, then Singapore (`prod_region_b`):
-```bash
-cd ../prod_region_a
-terraform init
-terraform apply
-
-cd ../prod_region_b
-terraform init
-terraform apply
-```
+### 4. Global
+Update ALB ARNs from both regions into `global/main.tf`, then run `terraform apply`.
+*This creates the Global Accelerator "Traffic Brain" for the global entry.*
 
 ## Verification
-
-Once deployed, you can verify the status:
-- **EKS**: Run `aws eks update-kubeconfig --region ap-south-1 --name prod-mumbai` and check nodes.
-- **DNS**: Verify that `api.my-eks-app.com` resolves to the nearest ALB.
-- **Backup**: Verify that state files are present in the S3 bucket under `region-a/` and `region-b/`.
+- **GitOps**: Run `kubectl get pods -n argocd` in both clusters.
+- **Peering**: Ping a private IP in Singapore from a Mumbai pod.
+- **Global Entry**: Use the Global Accelerator DNS to reach the app.
