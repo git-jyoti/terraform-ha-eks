@@ -82,3 +82,18 @@ When a customer asks, "Why is this the best approach?", here is your talk track:
 *   **Region A to Region B**: Connected via **VPC Peering** (Traffic) and **Aurora Global Cluster** (Data).
 *   **User to Regions**: Connected via **Global Accelerator** (Traffic entry).
 *   **Git to Pods**: Connected via **ArgoCD** (Automation).
+
+---
+
+## 4. Why Primary/Secondary for the Database?
+
+A common question from customers is: *"Why not make both regions Primary?"*
+
+**The Technical Answer**: 
+Relational databases (SQL) require absolute consistency. If both regions could write simultaneously, you risk "data drift" or "split-brain" where the two regions disagree on the data. 
+
+**The Solution in this Plan**:
+We use **Aurora Global Database** which provides:
+1.  **Global Performance**: Local "Read" speed in both regions.
+2.  **Data Integrity**: A single "Writer" (Primary) to prevent data corruption.
+3.  **Elite Disaster Recovery**: If the Primary region fails, the Secondary is promoted to Primary automatically in seconds.
