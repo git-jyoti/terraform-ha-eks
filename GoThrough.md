@@ -1,5 +1,8 @@
 # GoThrough - Enterprise Multi-Region EKS Blueprint
 
+> [!IMPORTANT]
+> **START HERE**: The very first command you must run is in `infrastructure/bootstrap/`. You cannot proceed with other regions until the Remote State (S3 & DynamoDB) is created.
+
 This document explains the architecture, folder structure, and deployment steps for the "Best of Best" EKS setup. Use this as your guide for implementation and as a presentation aid for your customers.
 
 ---
