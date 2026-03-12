@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > **START HERE**: The very first command you must run is in `infrastructure/bootstrap/`. You cannot proceed with other regions until the Remote State (S3 & DynamoDB) is created.
 
-This document explains the architecture, folder structure, and deployment steps for the "Best of Best" EKS setup. Use this as your guide for implementation and as a presentation aid for your customers.
+This document explains the architecture, folder structure, and deployment steps for the  EKS setup. .
 
 ---
 
@@ -57,20 +57,20 @@ This is where the actual code lives. It's granular so you can change one part wi
 
 ---
 
-## 3. How to Explain this to a Customer
+## 3. Explanation
 
-When a customer asks, "Why is this the best approach?", here is your talk track:
+"Why is this the best approach?":
 
-**"Mr. Customer, we have built a World-Class infrastructure based on three pillars:"**
+**"we have built a World-Class infrastructure based on three pillars:"**
 
 1.  **Extreme High Availability (Active-Active)**:
-    "We aren't just in one region. We are in Mumbai and Singapore simultaneously. If an entire region goes offline, our **Global Accelerator** will reroute your users to the second region in seconds. You have a 99.99% uptime target."
+    "We aren't just in one region. We are in Mumbai and Singapore simultaneously. If an entire region goes offline, our **Global Accelerator** will reroute the users to the second region in seconds. We have a 99.99% uptime target."
 
 2.  **Zero-Trust Security**:
-    "Security is baked in, not bolted on. We use **Kubernetes Network Policies** to isolate traffic so the Frontend can't talk to the DB directly. We also use **VPC Peering** so our cross-region data never touches the public internet."
+    "We use **Kubernetes Network Policies** to isolate traffic so the Frontend can't talk to the DB directly. We also use **VPC Peering** so our cross-region data never touches the public internet."
 
 3.  **Data Consistency**:
-    "We use **Aurora Global Database**. This means your data is replicated between regions in under a second. Even in a disaster, your data is safe and synchronized."
+    "We use **Aurora Global Database**. This means the data is replicated between regions in under a second. Even in a disaster, your data is safe and synchronized."
 
 4.  **Operational Excellence (GitOps)**:
     "We use **ArgoCD**. This means our deployments are automated. We don't make mistakes by hand; we manage everything via Git. If the code is in Git, it's in the cluster."
@@ -87,7 +87,7 @@ When a customer asks, "Why is this the best approach?", here is your talk track:
 
 ## 4. Why Primary/Secondary for the Database?
 
-A common question from customers is: *"Why not make both regions Primary?"*
+A common question is: *"Why not make both regions Primary?"*
 
 **The Technical Answer**: 
 Relational databases (SQL) require absolute consistency. If both regions could write simultaneously, you risk "data drift" or "split-brain" where the two regions disagree on the data. 
