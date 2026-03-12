@@ -98,12 +98,5 @@ We use **Aurora Global Database** which provides:
 2.  **Data Integrity**: A single "Writer" (Primary) to prevent data corruption.
 3.  **Elite Disaster Recovery**: If the Primary region fails, the Secondary is promoted to Primary automatically in seconds.
 
----
-
-## 5. What is AWS Global Accelerator?
-
-Think of it as the **"Smart Front Door"** for the global infrastructure.
-
-1.  **Static IPs**: Provides 2 permanent IP addresses for the whole world. No more DNS propagation issues.
-2.  **AWS Backbone**: Traffic travels over AWS private fiber, not the public internet. It's faster and more stable.
-3.  **Instant Failover**: It detects a regional failure and reroutes traffic in seconds (not minutes like DNS).
+## 5. Architectural Research Notes
+For details on how to handle **Multi-Account** setups and **Restricted Application Access** (e.g., 5 vs 10 apps), see [RESEARCH_NOTES.md](file:///c:/Users/heman/learning/aws/terraform-ha-eks/RESEARCH_NOTES.md).
