@@ -1,0 +1,25 @@
+name: OnlineBookStore CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+env:
+  NAME: onlinebookstore
+  IMAGE_REPO: jyotipmohapatra
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted
+    permissions:
+      id-token: write   # required for OIDC
+      contents: read    # usually needed for checkout
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::592579839583:role/OIDCRoleGithubAction
+          aws-region: ap-south-1
