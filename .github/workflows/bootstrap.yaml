@@ -27,7 +27,13 @@ jobs:
           role-to-assume: arn:aws:iam::592579839583:role/eks-terraform-githubaction-role
           aws-region: ap-south-1
           
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
           
+      - name: Verify Terraform Version
+        run: terraform version
       - name: Terraform Init
         run: terraform init
 
