@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket         = "ha-eks-terraform-state-<ACCOUNT_ID>"
+    bucket         = "ha-eks-terraform-state-592579839583"
     key            = "region-a/terraform.tfstate"
     region         = "ap-south-1"
     dynamodb_table = "ha-eks-terraform-locks"
@@ -38,9 +38,9 @@ module "network" {
 
   project_name       = local.project_name
   vpc_cidr           = local.vpc_cidr
-  public_subnets     = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24"]
-  private_subnets    = ["10.1.10.0/24", "10.1.11.0/24", "10.1.12.0/24"]
-  availability_zones = ["ap-south-1a", "ap-south-1b", "ap-south-1c"]
+  public_subnets     = ["10.1.1.0/24"]
+  private_subnets    = ["10.1.10.0/24"]
+  availability_zones = ["ap-south-1a"]
   cluster_name       = local.cluster_name
   tags               = local.tags
 }
@@ -91,77 +91,3 @@ module "load_balancer" {
   tags              = local.tags
 }
 
-module "dns" {
-  source = "../modules/dns"
-
-  domain_name = "my-eks-app.com"
-  subdomain   = "api"
-  lb_dns_name = module.load_balancer.alb_dns_name
-  lb_zone_id  = "Z1108A5E79EU0" # Example ALB Zone ID for ap-south-1
-  region      = local.region
-  tags        = local.tags
-}
-
-module "storage" {
-  source = "../modules/storage"
-
-  project_name = local.project_name
-  kms_key_arn  = module.security.kms_key_arn
-  subnet_ids   = module.network.private_subnet_ids
-  efs_sg_id    = module.security.node_sg_id
-  tags         = local.tags
-}
-
-module "logging" {
-  source = "../modules/logging_monitoring"
-
-  cluster_name = local.cluster_name
-  tags         = local.tags
-}
-
-module "ha" {
-  source = "../modules/multi_region_ha"
-
-  region           = local.region
-  cluster_endpoint = module.eks_cluster.cluster_endpoint
-}
-
-# Elite: Database Primary (Writer)
-module "database" {
-  source = "../modules/database"
-
-  project_name      = local.project_name
-  is_global_cluster = true
-  db_name           = "production_db"
-  
-  db_subnet_group_name   = "main-subnet-group" # Needs to be created
-  vpc_security_group_ids = [module.security.node_sg_id]
-  instance_count         = 2
-  tags                   = local.tags
-}
-
-# Elite: VPC Peering Request
-module "peering_request" {
-  source = "../modules/vpc_peering"
-
-  project_name        = local.project_name
-  vpc_id              = module.network.vpc_id
-  peer_vpc_id         = "vpc-xxxxxxxx" # Replace with Region B VPC ID
-  peer_region         = "ap-southeast-1"
-  peer_vpc_cidr       = "10.2.0.0/16"
-  vpc_route_table_ids = [module.network.vpc_id] # Simplified
-  tags                = local.tags
-}
-
-# Elite: GitOps (ArgoCD)
-module "gitops" {
-  source = "../modules/gitops"
-}
-
-module "network_policies" {
-  source = "../modules/network_policy"
-
-  namespace    = "default"
-  backend_port = 8080
-  db_port      = 5432
-}
