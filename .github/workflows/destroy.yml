@@ -1,0 +1,43 @@
+name: destroy AWS resources
+
+on:
+  push:
+    branches: [ "main" ]
+    
+  workflow_dispatch:
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+  
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infrastructure/prod_region_a
+        
+    permissions:
+      id-token: write   # required for OIDC
+      contents: read    # usually needed for checkout
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::592579839583:role/eks-terraform-githubaction-role
+          aws-region: ap-south-1
+          
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+          
+      - name: Verify Terraform Version
+        run: terraform version
+      - name: Terraform Init
+        run: terraform init
+        
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve
+      
+      
