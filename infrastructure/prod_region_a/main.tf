@@ -38,9 +38,9 @@ module "network" {
 
   project_name       = local.project_name
   vpc_cidr           = local.vpc_cidr
-  public_subnets     = ["10.1.1.0/24"]
-  private_subnets    = ["10.1.10.0/24"]
-  availability_zones = ["ap-south-1a"]
+  public_subnets     = ["10.1.1.0/24", "10.1.2.0/24"]
+  private_subnets    = ["10.1.10.0/24", "10.1.11.0/24"]
+  availability_zones = ["ap-south-1a", "ap-south-1b"]
   cluster_name       = local.cluster_name
   tags               = local.tags
 }
