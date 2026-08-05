@@ -1,6 +1,13 @@
-# EKS Cluster Role
-resource "aws_iam_role" "cluster" {
+# Existing EKS Cluster IAM Role
+data "aws_iam_role" "cluster" {
   name = "${var.project_name}-cluster-role"
+}
+
+
+# Existing EKS Node Group IAM Role
+data "aws_iam_role" "nodes" {
+  name = "${var.project_name}-node-role"
+}
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
