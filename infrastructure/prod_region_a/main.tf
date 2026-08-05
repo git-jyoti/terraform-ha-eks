@@ -3,7 +3,7 @@ terraform {
     bucket         = "ha-eks-terraform-state-592579839583"
     key            = "region-a/terraform.tfstate"
     region         = "ap-south-1"
-    dynamodb_table = "ha-eks-terraform-locks"
+    //dynamodb_table = "ha-eks-terraform-locks"
     encrypt        = true
   }
 }
