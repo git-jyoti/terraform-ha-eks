@@ -11,10 +11,10 @@ resource "aws_kms_key" "eks" {
   )
 }
 
-resource "aws_kms_alias" "eks" {
+/*resource "aws_kms_alias" "eks" {
   name          = "alias/${var.project_name}-eks"
   target_key_id = aws_kms_key.eks.key_id
-}
+}*/
 
 resource "aws_security_group" "cluster" {
   name        = "${var.project_name}-cluster-sg"
