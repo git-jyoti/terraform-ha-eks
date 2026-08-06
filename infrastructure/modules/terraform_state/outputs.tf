@@ -4,6 +4,6 @@ output "bucket_name" {
 }
 
 output "table_name" {
-  value       = aws_dynamodb_table.terraform_locks.name
+  value       = aws_dynamodb_table.terraform_locks_table.name
   description = "The name of the DynamoDB table"
 }
