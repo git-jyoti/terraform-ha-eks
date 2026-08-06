@@ -68,7 +68,7 @@ module "eks_cluster" {
   cluster_role_arn = module.iam.cluster_role_arn
   subnet_ids       = module.network.private_subnet_ids
   cluster_sg_id    = module.security.cluster_sg_id
-  kms_key_arn      = module.security.kms_key_arn
+  //kms_key_arn      = module.security.kms_key_arn
   tags             = local.tags
 }
 
@@ -81,7 +81,7 @@ module "node_group" {
   tags          = local.tags
 }
 
-module "load_balancer" {
+/*module "load_balancer" {
   source = "../modules/load_balancer"
 
   project_name      = local.project_name
@@ -89,5 +89,5 @@ module "load_balancer" {
   alb_sg_id         = module.security.node_sg_id # Simplified, should use dedicated ALB SG
   public_subnet_ids = module.network.public_subnet_ids
   tags              = local.tags
-}
+}*/
 
