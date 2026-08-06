@@ -15,12 +15,12 @@ resource "aws_eks_cluster" "this" {
       key_arn = var.kms_key_arn
     }
     resources = ["secrets"]
-  }
+  } */
 
   enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   tags = var.tags
-}*/
+}
 
 data "tls_certificate" "this" {
   url = aws_eks_cluster.this.identity[0].oidc[0].issuer
