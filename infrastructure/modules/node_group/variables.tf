@@ -12,12 +12,12 @@ variable "subnet_ids" {
 
 variable "desired_size" {
   type    = number
-  default = 2
+  default = 1
 }
 
 variable "max_size" {
   type    = number
-  default = 4
+  default = 2
 }
 
 variable "min_size" {
