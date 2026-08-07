@@ -7,7 +7,8 @@ output "public_subnet_ids" {
 }
 
 output "private_subnet_ids" {
-  value = aws_subnet.private[*].id
+  value      = aws_subnet.private[*].id
+  depends_on = [aws_route_table_association.private]
 }
 
 output "nat_gateway_ips" {
